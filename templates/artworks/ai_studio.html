@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}✨ AI Studio - Generate Concept Art{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 10px; color: #1f2937;">
+        ✨ AI Art Studio
+    </h1>
+    <p style="font-size: 1.1rem; color: #6b7280; margin-bottom: 40px;">
+        Describe your artwork idea and let AI generate concept art instantly.
+    </p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: flex-start;">
+
+        <!-- LEFT: FORM SECTION -->
+        <div style="background: #f9fafb; padding: 30px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: #111827;">Generate Image</h2>
+
+            <form method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+                {% csrf_token %}
+
+                <!-- PROMPT FIELD -->
+                <div>
+                    <label for="prompt" style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
+                        Describe your artwork:
+                    </label>
+                    <textarea name="prompt" id="prompt"
+                        placeholder="E.g., A serene mountain landscape with golden sunset"
+                        rows="4"
+                        maxlength="1000"
+                        required
+                        style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-family: inherit;"></textarea>
+                    {% if form.prompt.errors %}
+                        <div style="color: #dc2626; font-size: 14px; margin-top: 4px;">
+                            {{ form.prompt.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- STYLE FIELD -->
+                <div>
+                    <label for="style" style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
+                        Art Style:
+                    </label>
+                    <select name="style" id="style" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+                        <option value="realistic">Realistic</option>
+                        <option value="oil_painting">Oil Painting</option>
+                        <option value="digital_art">Digital Art</option>
+                        <option value="watercolor">Watercolor</option>
+                        <option value="anime">Anime Style</option>
+                        <option value="cartoon">Cartoon</option>
+                        <option value="sketch">Pencil Sketch</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="fantasy">Fantasy</option>
+                    </select>
+                </div>
+
+                <!-- WIDTH FIELD -->
+                <div>
+                    <label for="width" style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">
+                        Quality:
+                    </label>
+                    <select name="width" id="width" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+                        <option value="512">512px (fast)</option>
+                        <option value="768">768px (balanced)</option>
+                        <option value="1024">1024px (high quality, slower)</option>
+                    </select>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" style="
+                    background: #218098;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background 0.3s;
+                " onmouseover="this.style.background='#1a6372'" onmouseout="this.style.background='#218098'">
+                    🎨 Generate Image
+                </button>
+
+                <!-- ERROR MESSAGES -->
+                <!-- ERROR MESSAGE -->
+{% if error %}
+    <div style="background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+        <strong>❌ Error:</strong> {{ error }}
+    </div>
+{% endif %}
+
+            </form>
+        </div>
+
+        <!-- RIGHT: PREVIEW SECTION -->
+        <div style="background: #f9fafb; padding: 30px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: #111827;">Preview</h2>
+
+            {% if has_preview %}
+                <div>
+                    <img src="{{ preview_image_url }}" alt="Generated artwork"
+                         style="width: 100%; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+                    <p style="font-size: 14px; color: #6b7280; margin-bottom: 12px;">
+                        <strong>Prompt:</strong> {{ preview_prompt }}
+                    </p>
+
+                    <p style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 8px 12px; border-radius: 6px; margin-bottom: 20px;">
+                        🤖 AI-Generated with {{ preview_style }}
+                    </p>
+
+                    <!-- SAVE FORM -->
+                    <form method="POST" action="{% url 'save_concept_art' %}" style="display: flex; flex-direction: column; gap: 15px;">
+                        {% csrf_token %}
+
+                        <div>
+                            <label for="title" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px;">
+                                Artwork Title:
+                            </label>
+                            <input type="text" name="title" id="title"
+                                   placeholder="E.g., Mountain Sunset Concept"
+                                   required
+                                   style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+                        </div>
+
+                        <div>
+                            <label for="description" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px;">
+                                Description (optional):
+                            </label>
+                            <textarea name="description" id="description" rows="3"
+                                      placeholder="Add refinement notes..."
+                                      style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-family: inherit;"></textarea>
+                        </div>
+
+                        <button type="submit" style="
+                            background: #059669;
+                            color: white;
+                            padding: 12px;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 500;
+                            cursor: pointer;
+                            transition: background 0.3s;
+                        " onmouseover="this.style.background='#047857'" onmouseout="this.style.background='#059669'">
+                            💾 Save as Concept Art
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 400px;
+                    text-align: center;
+                    color: #9ca3af;
+                ">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🎨</div>
+                    <p style="font-size: 16px; margin: 0;">No preview yet</p>
+                    <p style="font-size: 14px; margin: 8px 0 0 0;">Generate an image to see it here!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

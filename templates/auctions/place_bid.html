@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+<head><title>Bid Placed</title></head>
+<body>
+    <h1>Your bid for {{ auction.artwork.title }} has been placed!</h1>
+    <a href="{% url 'auction_detail' auction.pk %}">Back to Auction</a>
+</body>
+</html>

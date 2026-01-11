@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart{% endblock %}
+{% block content %}
+
+<h1>Shopping Cart</h1>
+
+{% if cart_items %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #ddd; padding: 10px;">Artwork</th>
+                <th style="border: 1px solid #ddd; padding: 10px;">Price</th>
+                <th style="border: 1px solid #ddd; padding: 10px;">Qty</th>
+                <th style="border: 1px solid #ddd; padding: 10px;">Total</th>
+                <th style="border: 1px solid #ddd; padding: 10px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">{{ item.artwork.title }}</td>
+                <td style="border: 1px solid #ddd; padding: 10px;">${{ item.artwork.fixed_price }}</td>
+                <td style="border: 1px solid #ddd; padding: 10px;">{{ item.quantity }}</td>
+                <td style="border: 1px solid #ddd; padding: 10px;">${{ item.artwork.fixed_price|floatformat:2 }}</td>
+                <td style="border: 1px solid #ddd; padding: 10px;">
+                    <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px; text-align: right;">
+        <h2>Total: ${{ total|floatformat:2 }}</h2>
+        <a href="{% url 'view_cart' %}" style="background-color: #4c4cff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-right: 10px;">Proceed to Checkout</a>
+    </div>
+{% else %}
+    <p>Your cart is empty. <a href="{% url 'artwork_list' %}">Continue Shopping</a></p>
+{% endif %}
+
+{% endblock %}

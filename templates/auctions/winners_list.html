@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Auction Winners{% endblock %}
+{% block content %}
+
+<h1>🏆 Auction Winners</h1>
+
+{% if winners %}
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        {% for winner_auction in winners %}
+        <div style="border: 2px solid #FFD700; padding: 15px; border-radius: 8px; background: linear-gradient(135deg, #fff8dc 0%, #fffacd 100%);">
+            <div style="text-align: center;">
+                <h3>🏆 {{ winner_auction.artwork.title }}</h3>
+            </div>
+            
+            {% if winner_auction.artwork.image %}
+                <img src="{{ winner_auction.artwork.image.url }}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+            {% endif %}
+            
+            <div style="background-color: white; padding: 15px; border-radius: 4px;">
+                <p><strong>🥇 Winner:</strong> <span style="color: #FFD700; font-weight: bold; font-size: 16px;">{{ winner_auction.winner.username }}</span></p>
+                <p><strong>💰 Winning Bid:</strong> <span style="color: #28a745; font-weight: bold; font-size: 18px;">${{ winner_auction.current_bid }}</span></p>
+                <p><strong>📅 Auction Ended:</strong> {{ winner_auction.end_time|date:"M d, Y H:i" }}</p>
+                <p><strong>🎨 By Artist:</strong> {{ winner_auction.artwork.artist.username }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No winners yet. Check back soon!</p>
+{% endif %}
+
+{% endblock %}

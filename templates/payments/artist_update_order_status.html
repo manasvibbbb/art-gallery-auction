@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Update Order Status{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Update Status - {{ order.title }}</h1>
+
+  <p>
+    Current status:
+    <strong>{{ order.status }}</strong>
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label for="status">New status:</label>
+    <select name="status" id="status" class="form-control">
+      <option value="pending" {% if order.status == "pending" %}selected{% endif %}>Pending</option>
+      <option value="accepted" {% if order.status == "accepted" %}selected{% endif %}>Accepted</option>
+      <option value="in_progress" {% if order.status == "in_progress" %}selected{% endif %}>In progress</option>
+      <option value="completed" {% if order.status == "completed" %}selected{% endif %}>Completed</option>
+      <option value="rejected" {% if order.status == "rejected" %}selected{% endif %}>Rejected</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary" style="margin-top:10px;">
+      Update status
+    </button>
+  </form>
+
+  <p style="margin-top:15px;">
+    <a href="{% url 'artist_order_detail' order.pk %}">Back to order</a>
+  </p>
+</div>
+{% endblock %}

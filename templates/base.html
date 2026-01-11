@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Art Gallery{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, #f5f3f0 0%, #e8e5e0 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        /* Navigation Bar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #9db382;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #e8e5e0;
+            font-size: 15px;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        nav a:hover {
+            color: #9db382;
+            transform: translateY(-2px);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #9db382;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Cart Link Styling */
+        .cart-link {
+            background: linear-gradient(135deg, #9db382 0%, #8a9a6f 100%) !important;
+            color: white !important;
+            padding: 10px 20px !important;
+            border-radius: 25px !important;
+            font-weight: bold !important;
+            box-shadow: 0 5px 15px rgba(157, 179, 130, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .cart-link:hover {
+            background: linear-gradient(135deg, #8a9a6f 0%, #778860 100%) !important;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(157, 179, 130, 0.4);
+        }
+
+        /* Main Content */
+        .content-wrapper {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 52px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 40px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 30px 0 20px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: #3d5a6f;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        p {
+            line-height: 1.8;
+            color: #555;
+            font-size: 16px;
+            font-weight: 300;
+        }
+
+        /* Cards */
+        .artwork-card, .artist-card, .winner-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.15);
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border-top: 4px solid #9db382;
+        }
+
+        .artwork-card:hover, .artist-card:hover, .winner-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(44, 62, 80, 0.25);
+            border-top-color: #2c3e50;
+        }
+
+        .artwork-card img, .artist-card img, .winner-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .artwork-card p, .artist-card p, .winner-card p {
+            padding: 15px;
+            margin: 0;
+        }
+
+        /* Buttons */
+        a {
+            color: #2c3e50;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        button, input[type="submit"] {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+        }
+
+        button:hover, input[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(44, 62, 80, 0.4);
+            background: linear-gradient(135deg, #1a2332 0%, #0f1419 100%);
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        /* Forms */
+        input[type="text"], input[type="email"], input[type="password"],
+        input[type="number"], textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d4cfc8;
+            border-radius: 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            background-color: #fdfcfb;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus,
+        input[type="number"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #9db382;
+            box-shadow: 0 0 10px rgba(157, 179, 130, 0.2);
+            background-color: white;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-weight: 300;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.15);
+            margin-top: 20px;
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
+            color: white;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 15px;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid #e8e5e0;
+            transition: all 0.3s ease;
+        }
+
+        table tbody tr:hover {
+            background-color: #f5f3f0;
+        }
+
+        /* Special Elements */
+        .hero-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
+            color: #e8e5e0;
+            padding: 60px 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(44, 62, 80, 0.3);
+        }
+
+        .hero-section h1 {
+            color: #9db382;
+            font-size: 54px;
+            margin-bottom: 15px;
+        }
+
+        .hero-section p {
+            color: #d4cfc8;
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .auction-info {
+            background: #f5f3f0;
+            padding: 20px;
+            border-left: 5px solid #9db382;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        /* Rating Stars */
+        .stars {
+            color: #9db382;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        /* List Items */
+        ul, ol {
+            padding-left: 30px;
+            margin: 15px 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">🎨 Art Gallery</div>
+
+        <div class="nav-links">
+            <a href="{% url 'artwork_list' %}">Art Gallery</a>
+            <a href="{% url 'auction_list' %}">Auctions</a>
+            <a href="{% url 'customize_art' %}">Customize</a>
+            <a href="{% url 'artists_list' %}">🎨 Artists</a>
+            <a href="{% url 'winners_list' %}">🏆 Winners</a>
+            <a href="{% url 'ai_studio' %}">✨ AI Studio</a>
+            <a class="cart-link" href="{% url 'view_cart' %}">🛒 My Cart</a>
+
+
+
+            {% if user.is_authenticated %}
+                <a href="/accounts/profile/">👤 Profile</a>
+                <a href="{% url 'logout' %}">🚪 Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">🔐 Login</a>
+                <a href="{% url 'register' %}">📝 Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+ <a href="{% url 'my_custom_orders' %}">📝 My Orders</a>
+</body>
+</html>

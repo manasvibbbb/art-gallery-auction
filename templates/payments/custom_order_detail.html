@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Custom Order Details{% endblock %}
+{% block content %}
+
+<h1>Your Custom Art Order</h1>
+
+<div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+    <p><strong>Title:</strong> {{ order.title }}</p>
+    <p><strong>Type:</strong> {{ order.get_art_type_display }}</p>
+    <p><strong>Description:</strong> {{ order.description }}</p>
+    <p><strong>Dimensions:</strong> {{ order.length }}</p>
+    <p><strong>Budget:</strong> ${{ order.budget }}</p>
+    <p><strong>Artist Request:</strong> {{ order.artist_request|default:"None" }}</p>
+    <p><strong>Status:</strong> 
+        <span style="background-color: 
+            {% if order.status == 'pending' %}#ffc107
+            {% elif order.status == 'accepted' %}#28a745
+            {% elif order.status == 'completed' %}#17a2b8
+            {% else %}#dc3545{% endif %};
+            color: white; padding: 5px 10px; border-radius: 4px;">
+            {{ order.get_status_display }}
+        </span>
+    </p>
+    <p><strong>Ordered on:</strong> {{ order.created_at|date:"M d, Y" }}</p>
+</div>
+
+<a href="{% url 'my_custom_orders' %}" style="display: inline-block; margin-top: 20px; background-color: #4c4cff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">Back to My Orders</a>
+
+{% endblock %}

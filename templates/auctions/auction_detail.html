@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ auction.artwork.title }}{% endblock %}
+{% block content %}
+
+<h1>{{ auction.artwork.title }}</h1>
+
+{% if auction.artwork.image %}
+    <img src="{{ auction.artwork.image.url }}" style="max-width: 400px; border-radius: 8px;">
+{% endif %}
+
+<p>{{ auction.artwork.description }}</p>
+
+<div style="background-color: #f0f0f0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <p><strong>Starting Bid:</strong> ${{ auction.starting_bid }}</p>
+    <p><strong>Current Highest Bid:</strong> <span style="color: #28a745; font-size: 20px; font-weight: bold;">${{ auction.current_bid }}</span></p>
+    {% if auction.winner %}
+        <p><strong>Current Highest Bidder:</strong> {{ auction.winner.username }}</p>
+    {% endif %}
+    <p><strong>Ends:</strong> {{ auction.end_time|date:"M d, Y H:i" }}</p>
+</div>
+
+<!-- Bidding History -->
+<h3>💰 Bidding History</h3>
+<table style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr style="background-color: #667eea; color: white;">
+            <th style="border: 1px solid #ddd; padding: 10px;">Bidder</th>
+            <th style="border: 1px solid #ddd; padding: 10px;">Amount</th>
+            <th style="border: 1px solid #ddd; padding: 10px;">Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bid in bids %}
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 10px;">{{ bid.bidder.username }}</td>
+            <td style="border: 1px solid #ddd; padding: 10px; color: #28a745; font-weight: bold;">${{ bid.bid_amount }}</td>
+            <td style="border: 1px solid #ddd; padding: 10px;">{{ bid.bid_time|date:"M d H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Place Bid Form -->
+{% if user.is_authenticated %}
+<div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 20px;">
+    <h3>Place Your Bid</h3>
+    <form method="post" action="{% url 'place_bid' auction.pk %}">
+        {% csrf_token %}
+        <label>Your Bid (must be higher than ${{ auction.current_bid }}):</label>
+        <input type="number" step="0.01" name="bid_amount" min="{{ auction.current_bid|add:'0.01' }}" required style="padding: 8px; width: 200px;">
+        <button type="submit" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Place Bid</button>
+    </form>
+</div>
+{% else %}
+    <p><a href="{% url 'login' %}">Login</a> to place a bid</p>
+{% endif %}
+
+<a href="{% url 'auction_list' %}">Back to Auctions</a>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Login - Art Gallery{% endblock %}
+{% block content %}
+<div style="max-width:400px; margin:60px auto; padding:40px; background: #fff; border-radius: 18px; box-shadow:0 10px 32px rgba(44,62,80,0.18);">
+    <h1 style="font-family:'Cinzel',serif;font-size:38px;color:#2c3e50;margin-bottom:24px;text-align:center;">Login</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="username" style="font-size:18px;">Username</label>
+        <input type="text" name="username" style="width:100%;padding:10px 12px;margin-bottom:18px;border-radius:8px;border:1.5px solid #9db382;">
+
+        <label for="password" style="font-size:18px;">Password</label>
+        <input type="password" name="password" style="width:100%;padding:10px 12px;margin-bottom:18px;border-radius:8px;border:1.5px solid #9db382;">
+
+        {% if error %}
+        <div style="color:crimson; margin-bottom:15px;">{{ error }}</div>
+        {% endif %}
+
+        <button type="submit" style="width:100%; padding:12px; font-size:18px; border-radius:9px; background:#2c3e50; color:#fff;font-family:'Cinzel',serif;border:none;">Login</button>
+    </form>
+    <div style="margin-top:18px;text-align:center;font-size:16px;">
+        New here?
+        <a href="{% url 'register' %}" style="color:#9db382;text-decoration:underline;">Register</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Profile - Art Gallery{% endblock %}
+{% block content %}
+<div style="max-width:600px; margin:40px auto; padding:32px; background: #fff; border-radius: 18px; box-shadow:0 8px 24px rgba(44,62,80,0.12);">
+    <h1 style="font-size: 2.3em; font-family:'Cinzel',serif; letter-spacing:1px; color:#2c3e50;">Profile</h1>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>User Type:</strong> {{ user.user_type|title }}</p>
+    <a href="{% url 'my_custom_orders' %}"
+   style="display:inline-block; margin-top:20px; background:#2c3e50; color:white; padding:10px 22px; border-radius:8px; text-decoration:none; font-weight:600;">
+    📝 View Custom Orders
+</a>
+
+    <hr style="margin:24px 0;">
+    <a href="{% url 'logout' %}" style="color:#9db382;">Logout</a>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Save Concept Art{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; padding: 20px;">
+    <h1 style="font-size: 2rem; margin-bottom: 30px;">💾 Save Concept Art</h1>
+
+    <!-- PREVIEW IMAGE -->
+    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #e5e7eb;">
+        <img src="{{ preview_image_url }}" alt="Generated artwork"
+             style="width: 100%; border-radius: 8px; margin-bottom: 15px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+            <strong>Prompt:</strong> {{ preview_prompt }}
+        </p>
+    </div>
+
+    <!-- SAVE FORM -->
+    <form method="POST" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
+        {% csrf_token %}
+
+        <div style="margin-bottom: 20px;">
+            <label for="title" style="display: block; margin-bottom: 8px; font-weight: 500;">
+                Title:
+            </label>
+            <input type="text" name="title" id="title"
+                   placeholder="Give your artwork a title"
+                   required
+                   style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+            {% if form.title.errors %}
+                <div style="color: #dc2626; font-size: 14px; margin-top: 4px;">
+                    {{ form.title.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="description" style="display: block; margin-bottom: 8px; font-weight: 500;">
+                Description (optional):
+            </label>
+            <textarea name="description" id="description" rows="4"
+                      placeholder="Add notes about this artwork..."
+                      style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-family: inherit;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" style="
+                background: #059669;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-weight: 500;
+                cursor: pointer;
+                flex: 1;
+            ">
+                💾 Save Concept Art
+            </button>
+
+            <a href="{% url 'ai_studio' %}" style="
+                padding: 12px 24px;
+                color: #6b7280;
+                text-decoration: none;
+                background: #e5e7eb;
+                border-radius: 8px;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">
+                ← Back
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

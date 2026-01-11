@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Home - Art Gallery{% endblock %}
+{% block content %}
+
+<div class="hero-section">
+    <h1>✨ Welcome to the Art Gallery & Auction Platform</h1>
+    <p>Discover amazing artworks and participate in live auctions</p>
+</div>
+
+<div style="text-align: center; margin: 60px 0;">
+    <a href="{% url 'auction_list' %}" style="
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+        color: white;
+        padding: 35px 100px;
+        font-size: 32px;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 15px;
+        display: inline-block;
+        box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        transition: all 0.3s ease;
+        letter-spacing: 1px;
+    " onmouseover="this.style.transform='scale(1.08)'; this.style.boxShadow='0 20px 50px rgba(255, 107, 107, 0.6)';"
+    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 15px 40px rgba(255, 107, 107, 0.4)';">
+        🔨 JOIN LIVE AUCTION NOW!!!
+    </a>
+</div>
+
+<h2>🎨 Featured Artworks</h2>
+<div class="grid-3">
+    {% for artwork in artworks %}
+    <div class="artwork-card" style="border-radius: 15px; overflow: hidden;">
+        {% if artwork.image %}
+            <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
+        {% endif %}
+        <div style="padding: 20px;">
+            <h3>{{ artwork.title }}</h3>
+            <p style="color: #777; font-size: 13px;">{{ artwork.description|truncatewords:15 }}</p>
+            <p style="color: #667eea; font-weight: bold; font-size: 18px; margin: 10px 0;">💰 ${{ artwork.fixed_price }}</p>
+            <a href="{% url 'artwork_detail' artwork.pk %}" style="display: inline-block; margin-top: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 600;">View Details</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

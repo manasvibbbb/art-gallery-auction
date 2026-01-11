@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ artist.username }} - Artist Profile{% endblock %}
+{% block content %}
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 8px; margin-bottom: 30px;">
+    <div style="display: flex; gap: 30px; align-items: center;">
+        {% if artist.profile_image %}
+            <img src="{{ artist.profile_image.url }}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid white;">
+        {% else %}
+            <div style="width: 150px; height: 150px; border-radius: 50%; background-color: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 80px;">👤</span>
+            </div>
+        {% endif %}
+        <div>
+            <h1>{{ artist.username }}</h1>
+            {% if artist.bio %}
+                <p style="font-size: 16px; margin: 10px 0;">{{ artist.bio }}</p>
+            {% endif %}
+            <p style="margin: 10px 0;"><strong>⭐ Rating:</strong>
+                {% if avg_rating %}
+                    <span style="font-size: 20px;">{{ avg_rating|floatformat:1 }}/5 ⭐</span>
+                {% else %}
+                    <span>No ratings yet</span>
+                {% endif %}
+            </p>
+            <p style="margin: 10px 0;"><strong>🎨 Total Artworks:</strong> {{ artworks.count }}</p>
+            <p style="margin: 10px 0;"><strong>📝 Reviews:</strong> {{ ratings.count }}</p>
+        </div>
+    </div>
+</div>
+<h2>🎨 Artworks by {{ artist.username }}</h2>
+{% if artworks %}
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px;">
+        {% for artwork in artworks %}
+        <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; background-color: #f9f9f9;">
+            {% if artwork.image %}
+                <img src="{{ artwork.image.url }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+            {% endif %}
+            <h3>{{ artwork.title }}</h3>
+            <p>{{ artwork.description|truncatewords:15 }}</p>
+            <p style="color: #667eea; font-weight: bold;">💰 Price: ${{ artwork.fixed_price }}</p>
+            <a href="{% url 'artwork_detail' artwork.pk %}" style="color: #667eea; text-decoration: underline;">View</a>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>This artist hasn't uploaded any artworks yet.</p>
+{% endif %}
+<h2 style="margin-top: 40px;">⭐ Reviews</h2>
+{% if ratings %}
+    <div style="margin-top: 20px;">
+        {% for rating in ratings %}
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #FFD700;">
+            <p><strong>{{ rating.rater.username }}</strong> -
+                <span style="color: #FFD700;">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= rating.rating %}⭐{% else %}☆{% endif %}
+                    {% endfor %}
+                </span>
+            </p>
+            {% if rating.review %}
+                <p style="color: #666; margin-top: 5px;">{{ rating.review }}</p>
+            {% endif %}
+            <p style="color: #999; font-size: 12px;">{{ rating.created_at|date:"M d, Y" }}</p>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No reviews yet. Be the first to review this artist!</p>
+{% endif %}
+{% if review_form %}
+    <div style="margin-top:40px; max-width:500px;">
+        <h3>Leave a Review</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ review_form.as_p }}
+            <button type="submit" class="btn btn-primary" style="margin-top:10px;background:#667eea;border:none;color:white;border-radius:8px;padding:10px 25px;">Submit Review</button>
+        </form>
+    </div>
+{% endif %}
+<a href="{% url 'artists_list' %}" style="display: inline-block; margin-top: 20px; background-color: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">Back to Artists</a>
+{% endblock %}
