@@ -1,12 +1,25 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import Avg, Count
+from django.db.models import Avg
 from .models import CustomUser, ArtistRating
 from artworks.models import Artwork
-from django.contrib.auth.decorators import login_required
+from auctions.models import Auction
 from .forms import ArtistRatingForm
 
+
+@login_required
+def artist_dashboard(request):
+    """Artist dashboard showing their artworks and auction stats"""
+    artworks = Artwork.objects.filter(artist=request.user)
+    auctions = Auction.objects.filter(artwork__artist=request.user)
+
+    context = {
+        'artworks': artworks,
+        'auctions': auctions,
+        'total_artworks': artworks.count(),
+    }
+    return render(request, 'accounts/artist_dashboard.html', context)
 
 
 def register(request):
@@ -27,6 +40,9 @@ def register(request):
                 user_type=user_type
             )
             login(request, user)
+            # ✅ REDIRECT ARTISTS TO ADD ARTWORK PAGE
+            if user.user_type == 'artist':
+                return redirect('artworks:add_artwork')
             return redirect("home")
 
     return render(request, "accounts/register.html", {"error": error})
@@ -46,45 +62,51 @@ def login_view(request):
             error = "Invalid username or password"
 
     return render(request, "accounts/login.html", {"error": error})
+
+
 def logout_view(request):
     logout(request)
     return redirect("login")
 
+
 @login_required
 def profile(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
     return render(request, "accounts/profile.html", {"user": request.user})
+
+
 @login_required
 def artists_list(request):
-
     artists = CustomUser.objects.filter(user_type='artist')
-
     return render(request, 'accounts/artists_list.html', {'artists': artists})
+
+
 @login_required
 def artist_detail(request, pk):
-    artist = get_object_or_404(CustomUser, pk=pk, user_type='artist')
-    artworks = Artwork.objects.filter(artist=artist)
-    ratings = artist.artist_ratings.all()
+    artist = CustomUser.objects.get(pk=pk)
+    artworks = artist.artworks.all()
+    ratings = artist.ratings.all()
+
+    # Calculate average rating
     avg_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
-    review_form = None
-    if request.user != artist and request.user.is_authenticated:
-        if request.method == "POST":
-            review_form = ArtistRatingForm(request.POST)
-            if review_form.is_valid():
-                review = review_form.save(commit=False)
-                review.rater = request.user
-                review.artist = artist
-                review.save()
-                return redirect('artist_detail', pk=artist.pk)
-        else:
-            review_form = ArtistRatingForm(request.POST or None)
-        context = {
+
+    # Handle review form
+    review_form = ArtistRatingForm()
+    if request.method == "POST":
+        review_form = ArtistRatingForm(request.POST)
+        if review_form.is_valid():
+            rating = review_form.save(commit=False)
+            rating.artist = artist
+            rating.reviewer = request.user
+            rating.save()
+            return redirect('artist_detail', pk=pk)
+
+    # ✅ CONTEXT DEFINED HERE - OUTSIDE THE IF BLOCK
+    context = {
         'artist': artist,
         'artworks': artworks,
         'ratings': ratings,
         'avg_rating': avg_rating,
-        'review_form': review_form
+        'review_form': review_form,
     }
-    return render(request, "accounts/artist_detail.html", context)
 
+    return render(request, "accounts/artist_detail.html", context)
