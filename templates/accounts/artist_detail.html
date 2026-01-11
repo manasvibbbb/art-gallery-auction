@@ -38,7 +38,8 @@
             {% endif %}
             <h3>{{ artwork.title }}</h3>
             <p>{{ artwork.description|truncatewords:15 }}</p>
-            <p style="color: #667eea; font-weight: bold;">💰 Price: ${{ artwork.fixed_price }}</p>
+            <p style="color: #667eea; font-weight: bold;">💰 Price: ${{ artwork.price }}View
+</p>
             <a href="{% url 'artwork_detail' artwork.pk %}" style="color: #667eea; text-decoration: underline;">View</a>
         </div>
         {% endfor %}

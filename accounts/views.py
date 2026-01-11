@@ -2,15 +2,19 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Avg
+
 from .models import CustomUser, ArtistRating
+from .forms import ArtistRatingForm
+
 from artworks.models import Artwork
 from auctions.models import Auction
-from .forms import ArtistRatingForm
 
 
 @login_required
 def artist_dashboard(request):
     """Artist dashboard showing their artworks and auction stats"""
+
+    # ✅ FIX: use request.user (artist was undefined before)
     artworks = Artwork.objects.filter(artist=request.user)
     auctions = Auction.objects.filter(artwork__artist=request.user)
 
@@ -40,9 +44,11 @@ def register(request):
                 user_type=user_type
             )
             login(request, user)
-            # ✅ REDIRECT ARTISTS TO ADD ARTWORK PAGE
+
+            # Redirect artists to add artwork page
             if user.user_type == 'artist':
-                return redirect('artworks:add_artwork')
+                return redirect('add_artwork')
+
             return redirect("home")
 
     return render(request, "accounts/register.html", {"error": error})
@@ -82,25 +88,26 @@ def artists_list(request):
 
 @login_required
 def artist_detail(request, pk):
-    artist = CustomUser.objects.get(pk=pk)
-    artworks = artist.artworks.all()
-    ratings = artist.ratings.all()
+    artist = get_object_or_404(CustomUser, pk=pk)
 
-    # Calculate average rating
+    # ✅ SAFE artwork lookup
+    artworks = Artwork.objects.filter(artist=artist)
+
+    # ✅ Correct artist-level ratings
+    ratings = ArtistRating.objects.filter(artist=artist)
     avg_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
 
-    # Handle review form
     review_form = ArtistRatingForm()
+
     if request.method == "POST":
         review_form = ArtistRatingForm(request.POST)
         if review_form.is_valid():
             rating = review_form.save(commit=False)
             rating.artist = artist
-            rating.reviewer = request.user
+            rating.rater = request.user
             rating.save()
             return redirect('artist_detail', pk=pk)
 
-    # ✅ CONTEXT DEFINED HERE - OUTSIDE THE IF BLOCK
     context = {
         'artist': artist,
         'artworks': artworks,
@@ -108,5 +115,4 @@ def artist_detail(request, pk):
         'avg_rating': avg_rating,
         'review_form': review_form,
     }
-
     return render(request, "accounts/artist_detail.html", context)

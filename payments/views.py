@@ -34,9 +34,9 @@ def view_cart(request):
     """Display shopping cart with total calculation"""
     cart_items = CartItem.objects.filter(user=request.user)
 
-    # Calculate total, handling cases where fixed_price might be None
+    # Calculate total
     total = sum(
-        (item.artwork.fixed_price or 0) * item.quantity
+        (item.artwork.price or 0) * item.quantity
         for item in cart_items
     )
 
@@ -151,7 +151,7 @@ def checkout(request, pk):
         order = Order.objects.create(
             buyer=request.user,
             artwork=artwork,
-            amount=artwork.fixed_price or 0,
+            amount=artwork.price or 0,
             status='pending',
         )
         return redirect('payment', order_id=order.pk)
@@ -177,11 +177,8 @@ def payment(request, order_id):
             is_successful=True,
         )
 
-        # Update order and artwork status
+        # Update order status
         order.status = 'completed'
-        artwork = order.artwork
-        artwork.is_sold = True
-        artwork.save()
         order.save()
 
         return redirect('payment_success', payment_id=order.pk)

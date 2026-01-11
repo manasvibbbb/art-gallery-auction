@@ -23,8 +23,9 @@
 
         <p style="margin: 10px 0;">
             <strong>Price:</strong>
-            {% if artwork.fixed_price %}
-                ${{ artwork.fixed_price }}
+            {% if artwork.price %}
+${{ artwork.price }}
+
             {% else %}
                 Not set
             {% endif %}

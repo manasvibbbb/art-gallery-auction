@@ -1,61 +1,83 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Artist Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>🎨 {{ user.username }}'s Dashboard</h2>
-            <a href="{% url 'artworks:add_artwork' %}" class="btn btn-primary">➕ Add New Artwork</a>
-        </div>
+{% extends 'base.html' %}
 
-        {% if not has_artworks %}
-        <div class="alert alert-info text-center">
-            <h4>👋 Welcome Artist!</h4>
-            <p>No artworks yet. Create your first masterpiece!</p>
-            <a href="{% url 'artworks:add_artwork' %}" class="btn btn-success btn-lg">
-                🚀 Add Your First Artwork
-            </a>
-            <div class="mt-3">
-                <a href="{% url 'artworks:ai_studio' %}" class="btn btn-info">✨ Or Generate AI Art</a>
+{% block title %}Artist Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Sidebar -->
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h4>🎨 {{ user.username }}</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Total Artworks:</strong> {{ total_artworks }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Active Auctions:</strong> {{ auctions.count }}
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'add_artwork' %}" class="btn btn-success w-100">➕ Add New Artwork</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'ai_studio' %}" class="btn btn-info w-100">✨ AI Art Studio</a>
+                    </li>
+                </ul>
             </div>
         </div>
-        {% else %}
-        <h4>Your Artworks ({{ artworks.count }})</h4>
-        <div class="row">
-            {% for artwork in artworks %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    {% if artwork.image %}
-                    <img src="{{ artwork.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                    {% endif %}
-                    <div class="card-body">
-                        <h6 class="card-title">{{ artwork.title }}</h6>
-                        <p class="card-text small">{{ artwork.description|truncatewords:10 }}</p>
 
-                        {% if artwork.is_ai_generated %}
-                        <span class="badge bg-info mb-2">🤖 AI Generated</span>
-                        {% endif %}
+        <div class="col-md-9">
+            <!-- Main Content -->
+            <h2>Your Artworks ({{ total_artworks }})</h2>
 
-                        {% if artwork.sale_type == 'auction' %}
-                        <span class="badge bg-warning">🔥 Live Auction</span>
-                        <span class="fw-bold text-success">₹{{ artwork.starting_price }}</span>
-                        {% else %}
-                        <span class="badge bg-success">💰 Fixed Price</span>
-                        <span class="fw-bold text-primary">₹{{ artwork.fixed_price }}</span>
-                        {% endif %}
+            {% if artworks %}
+                <div class="row">
+                    {% for artwork in artworks %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card artwork-card h-100">
+                            {% if artwork.image %}
+                                <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ artwork.title }}</h5>
+                                <p class="card-text">{{ artwork.description|truncatewords:20 }}</p>
+                                <p class="text-primary fw-bold">
+                                    {% if artwork.sale_type == 'auction' %} 🔨 Auction ({{ artwork.auction.starting_price }}) {% else %} 💰 Fixed: ${{ artwork.price }} {% endif %}
 
-                        <div class="mt-2">
-                            <a href="{% url 'artwork_detail' artwork.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                                </p>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-            </div>
-            {% endfor %}
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <h4>No artworks yet!</h4>
+                    <p><a href="{% url 'add_artwork' %}" class="btn btn-success btn-lg">➕ Create Your First Artwork</a></p>
+                </div>
+            {% endif %}
+
+            <h3 class="mt-5">Active Auctions</h3>
+            {% if auctions %}
+                <div class="row">
+                    {% for auction in auctions %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>{{ auction.artwork.title }}</h6>
+                                <p>Current Bid: ${{ auction.current_bid }}</p>
+                                <small>Ends: {{ auction.end_time }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No active auctions.</p>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

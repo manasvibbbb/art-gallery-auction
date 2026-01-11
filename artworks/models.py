@@ -1,5 +1,7 @@
 from django.db import models
-from accounts.models import CustomUser
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Artwork(models.Model):
@@ -12,7 +14,7 @@ class Artwork(models.Model):
     artist = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='artworks/')
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     sale_type = models.CharField(max_length=10, choices=SALE_TYPES, default='normal')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -21,3 +23,13 @@ class Artwork(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class Rating(models.Model):
+    artwork = models.ForeignKey(Artwork, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.artwork.title} - {self.rating} stars"
