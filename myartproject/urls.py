@@ -15,6 +15,8 @@ urlpatterns = [
     path('artworks/', include('artworks.urls')),
     path('auctions/', include('auctions.urls')),
     path('payments/', include('payments.urls')),
+    path('accounts/', include('accounts.urls')),
+
 ]
 
 if settings.DEBUG:

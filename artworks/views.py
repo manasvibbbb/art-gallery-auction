@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
+import base64
+
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
-from .models import Artwork
-from .forms import AIArtGenerationForm, SaveConceptArtForm
+from django.shortcuts import render, redirect, get_object_or_404
+
 from .ai_service import generate_ai_image
-import base64
+from .forms import AIArtGenerationForm, SaveConceptArtForm
+from .models import Artwork
 
 
 def home(request):
@@ -212,3 +214,39 @@ def winners_list(request):
     except:
         # If auctions app doesn't exist, show empty list
         return render(request, 'artworks/winners_list.html', {'auctions': []})
+
+
+@login_required
+def add_artwork(request):
+    if request.user.user_type != 'artist':
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = ArtworkForm(request.POST, request.FILES)
+        if form.is_valid():
+            artwork = form.save(commit=False)
+            artwork.artist = request.user
+            artwork.save()
+
+            # Redirect based on sale type
+            if artwork.sale_type == 'auction':
+                return redirect('auctions:create_auction', artwork_id=artwork.id)
+            return redirect('artist_dashboard')
+    else:
+        form = ArtworkForm()
+
+    return render(request, 'artworks/add_artwork.html', {'form': form})
+
+
+@login_required
+def artist_dashboard(request):
+    if request.user.user_type != 'artist':
+        return redirect('home')
+
+    artworks = Artwork.objects.filter(artist=request.user)
+    has_artworks = artworks.exists()
+
+    return render(request, 'accounts/artist_dashboard.html', {
+        'artworks': artworks,
+        'has_artworks': has_artworks,
+    })

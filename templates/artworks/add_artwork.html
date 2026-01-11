@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Artwork</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">🎨 Add New Artwork</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                {{ form.title }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                {{ form.description }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Upload Image</label>
+                                {{ form.image }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Sale Type</label>
+                                {{ form.sale_type }}
+                                <small class="text-muted">
+                                    Auction: Live bidding | Fixed: Direct buy at price
+                                </small>
+                            </div>
+
+                            {% if form.sale_type.value == 'auction' %}
+                            <div class="mb-3">
+                                <label class="form-label">Starting Bid</label>
+                                {{ form.starting_price }}
+                            </div>
+                            {% else %}
+                            <div class="mb-3">
+                                <label class="form-label">Fixed Price</label>
+                                {{ form.fixed_price }}
+                            </div>
+                            {% endif %}
+
+                            <button type="submit" class="btn btn-success btn-lg w-100">
+                                ✅ Save & Publish
+                            </button>
+                        </form>
+
+                        <div class="mt-4 text-center">
+                            <a href="{% url 'artist_dashboard' %}" class="btn btn-outline-secondary">
+                                ← Back to Dashboard
+                            </a>
+                            <a href="{% url 'artworks:ai_studio' %}" class="btn btn-info">
+                                ✨ Generate AI Art
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -74,3 +74,11 @@ class SaveConceptArtForm(forms.ModelForm):
             'title': 'Artwork Title',
             'description': 'Description (optional)',
         }
+class ArtworkForm(forms.ModelForm):
+    class Meta:
+        model = Artwork
+        fields = ['title', 'description', 'image', 'price', 'sale_type']
+        widgets = {
+            'sale_type': forms.RadioSelect(choices=Artwork.SALE_TYPES),
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }

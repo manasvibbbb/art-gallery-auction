@@ -8,4 +8,6 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("artists/", views.artists_list, name="artists_list"),
     path("artists/<int:pk>/", views.artist_detail, name="artist_detail"),
+    path('artist-dashboard/', views.artist_dashboard, name='artist_dashboard'),
+
 ]
